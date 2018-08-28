@@ -4,34 +4,32 @@ import (
 	"fmt"
 	"net/http"
 	"io/ioutil"
-	"net/url"
+	"strings"
 )
 
-func GetTest() {
-	//构造url
-	u, err := url.Parse("http://www.baidu.com?")
+func PostTest(questUrl string,args map[string]string) {
+	fullUrl := questUrl
+	for key, value := range args {
+		fullUrl+= key
+		fullUrl+= "="
+		fullUrl+= value
+		fullUrl += "&"
+	}
+	fullUrl = string([]rune(fullUrl)[:len(fullUrl)-1])
+	fmt.Println("url:",fullUrl)
+
+	resp, err := http.Post(fullUrl,
+		"application/x-www-form-urlencoded",
+		strings.NewReader(""))
 	if err != nil {
-		fmt.Println("url parse fail")
-		return
+		fmt.Println(err)
 	}
-	q := u.Query()
-	q.Set("name", "wnw")
-	q.Set("sex", "wowam")
-	u.RawQuery = q.Encode()
-	fmt.Println("url:",u.String())
-	//发起get请求
-	resp, err1 := http.Get(u.String())
-	if err1 != nil || resp.StatusCode != http.StatusOK {
-		fmt.Println("get fail:", err1)
-		return
-	}
+
 	defer resp.Body.Close()
-	//读取响应体
-	body, err2 := ioutil.ReadAll(resp.Body)
-	if err2 != nil {
-		fmt.Println("read body fail")
-		return
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
 	}
 	fmt.Println(string(body))
-	//解析数据
+
 }

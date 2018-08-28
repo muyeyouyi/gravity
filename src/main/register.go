@@ -5,6 +5,7 @@ import (
 	"util"
 	"fmt"
 	"encoding/json"
+	"constant"
 )
 
 type Register struct {
@@ -21,6 +22,7 @@ type Register struct {
 	注册
  */
 func (user *Register)RegisterCommit(wlt wallet.Wallet) {
+	//字段加密
 	user.Name = util.AesAndBase64Encode(user.Name,wlt.AesKey)
 	user.Phonenum = util.AesAndBase64Encode(user.Phonenum,wlt.AesKey)
 	user.ID = util.AesAndBase64Encode(user.ID,wlt.AesKey)
@@ -29,20 +31,29 @@ func (user *Register)RegisterCommit(wlt wallet.Wallet) {
 		user.CompanyID = util.AesAndBase64Encode(user.CompanyID,wlt.AesKey)
 	}
 	fmt.Println("加密：",*user)
+
+	//生成json
 	jsonByte, e := json.Marshal(user)
 	//fmt.Println(string(jsonByte))
 	if e != nil {
 		fmt.Println(e)
 	}
+
+	//签名
 	args := Sign(wlt, string(jsonByte))
 
+	//网络请求
+	util.PostTest(constant.BaseUrl,args)
 
-	for key, value := range args {
-		fmt.Println("key:",key,"  value:",value)
-	}
-	verify := util.Verify(args["args0"], args["args1"], args["args2"])
-	fmt.Println("veryfy:",verify)
 
+	////测试验证签名
+	//for key, value := range args {
+	//	fmt.Println("key:",key,"  value:",value)
+	//}
+	//verify := util.Verify(args["args0"], args["args1"], args["args2"])
+	//fmt.Println("veryfy:",verify)
+
+	////测试解密
 	//user.Name = util.AesAndBase64Decode(user.Name,wlt.AesKey)
 	//user.Phonenum = util.AesAndBase64Decode(user.Phonenum,wlt.AesKey)
 	//user.ID = util.AesAndBase64Decode(user.ID,wlt.AesKey)
@@ -51,8 +62,6 @@ func (user *Register)RegisterCommit(wlt wallet.Wallet) {
 	//	user.CompanyID = util.AesAndBase64Decode(user.CompanyID,wlt.AesKey)
 	//}
 	//fmt.Println("解密:",*user)
-	//todo 网络请求
-
 
 }
 
