@@ -7,12 +7,7 @@ import (
 )
 
 func main() {
-	orgs := make(map[string]string)
-	orgs["name"] = "dfz"
-	orgs["age"] = "18"
-	orgs["tel"] = "13811111111"
-	util.PostTest("https://www.baidu.com?",orgs)
-	//cli()
+	cli()
 }
 
 func test() {

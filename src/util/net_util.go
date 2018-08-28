@@ -15,8 +15,9 @@ func PostTest(questUrl string,args map[string]string) {
 		fullUrl+= value
 		fullUrl += "&"
 	}
-	fullUrl = string([]rune(fullUrl)[:len(fullUrl)-1])
-	fmt.Println("url:",fullUrl)
+	//fmt.Println("url0:",fullUrl)
+	fullUrl = string(([]byte(fullUrl))[:len(fullUrl)-1])
+	fmt.Println("url1:",fullUrl)
 
 	resp, err := http.Post(fullUrl,
 		"application/x-www-form-urlencoded",
