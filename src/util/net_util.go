@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func PostTest(questUrl string,args map[string]string) {
+func PostTest(questUrl string,args map[string]string)[]byte {
 	fullUrl := questUrl
 	for key, value := range args {
 		fullUrl+= key
@@ -17,7 +17,7 @@ func PostTest(questUrl string,args map[string]string) {
 	}
 	//fmt.Println("url0:",fullUrl)
 	fullUrl = string(([]byte(fullUrl))[:len(fullUrl)-1])
-	fmt.Println("url1:",fullUrl)
+	fmt.Println("url:",fullUrl)
 
 	resp, err := http.Post(fullUrl,
 		"application/x-www-form-urlencoded",
@@ -31,6 +31,6 @@ func PostTest(questUrl string,args map[string]string) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(string(body))
-
+	fmt.Println("response:",string(body))
+	return body
 }

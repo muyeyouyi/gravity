@@ -21,5 +21,6 @@ func Sign(wlt wallet.Wallet,content string) map[string]string{
 	}
 	signature := append(r.Bytes(), s.Bytes()...)
 	args["args2"] = base64.StdEncoding.EncodeToString(signature)
+	args["accessToken"] = AccessToken
 	return args
 }
