@@ -15,21 +15,24 @@ const (
 	name              = "name"
 	registerCustom    = "registerc"
 	registerBussiness = "registerb"
-	walletName            = "w"
+	walletName        = "w"
 	id                = "id"
 	nickname          = "nn"
 	age               = "age"
 	tel               = "tel"
 	bussinessName     = "bn"
 	bussinessId       = "bid"
-	createPost       = "createpost"
-	title       = "title"
-	content       = "content"
-	city       = "city"
-	price       = "price"
-	getChainCodeList = "getchaincode"
-	getBussinessOrder = "getbusorder"
-	getCustomerOrder = "getcusorder"
+	createPost        = "createpost"
+	title             = "title"
+	content           = "content"
+	city              = "city"
+	price             = "price"
+	getChainCodeList  = "getchaincode"
+	getBusinessOrder  = "getbusorder"
+	getCustomerOrder  = "getcusorder"
+	getBusinessPost   = "getbuspost"
+	placeOrder   = "placeorder"
+	confirmOrder   = "confirmorder"
 )
 
 type Cli struct {
@@ -82,8 +85,22 @@ func (cli *Cli) Run() {
 	getCusOrderWallet := getCusOrderCmd.String(walletName, "", "在-w后输入钱包名称")
 
 	//B获取订单列表
-	getBusOrderCmd := flag.NewFlagSet(getBussinessOrder, flag.ExitOnError)
+	getBusOrderCmd := flag.NewFlagSet(getBusinessOrder, flag.ExitOnError)
 	getBusOrderWallet := getBusOrderCmd.String(walletName, "", "在-w后输入钱包名称")
+
+	//B获取帖子列表
+	getBusPostCmd := flag.NewFlagSet(getBusinessPost, flag.ExitOnError)
+	getBusPostWallet := getBusPostCmd.String(walletName, "", "在-w后输入钱包名称")
+
+	//C下单
+	placeOrderCmd := flag.NewFlagSet(placeOrder, flag.ExitOnError)
+	placeOrderWallet := placeOrderCmd.String(walletName, "", "在-w后输入钱包名称")
+	placeOrderId := placeOrderCmd.String(id, "", "在-id后输入帖子ID")
+
+	//B确认订单
+	confirmOrderCmd := flag.NewFlagSet(confirmOrder, flag.ExitOnError)
+	confirmOrderWallet := confirmOrderCmd.String(walletName, "", "在-w后输入钱包名称")
+	confirmOrderId := confirmOrderCmd.String(id, "", "在-id后输入订单ID")
 
 	//截取命令行内容
 	var err error
@@ -102,8 +119,14 @@ func (cli *Cli) Run() {
 		err = getChainCodeCmd.Parse(os.Args[2:])
 	case getCustomerOrder:
 		err = getCusOrderCmd.Parse(os.Args[2:])
-	case getBussinessOrder:
+	case getBusinessOrder:
 		err = getBusOrderCmd.Parse(os.Args[2:])
+	case getBusinessPost:
+		err = getBusPostCmd.Parse(os.Args[2:])
+	case placeOrder:
+		err = placeOrderCmd.Parse(os.Args[2:])
+	case confirmOrder:
+		err = confirmOrderCmd.Parse(os.Args[2:])
 	}
 
 	util.LogE(err)
@@ -156,11 +179,8 @@ func (cli *Cli) Run() {
 
 	if getCusOrderCmd.Parsed() {
 		if *getCusOrderWallet != "" {
-			wlt, e := wallet.ExamWallet(*getBusOrderWallet)
-			if e != nil {
-				util.LogE(e)
-				cli.printUsage()
-			}else{
+			wlt := ExamWallet(cli, *getCusOrderWallet)
+			if wlt != nil {
 				getInfo := &GetInfo{base64.StdEncoding.EncodeToString(wlt.PublicKey)}
 				getInfo.GetCustomOrder()
 			}
@@ -172,11 +192,8 @@ func (cli *Cli) Run() {
 
 	if getBusOrderCmd.Parsed() {
 		if *getBusOrderWallet != "" {
-			wlt, e := wallet.ExamWallet(*getBusOrderWallet)
-			if e != nil {
-				util.LogE(e)
-				cli.printUsage()
-			}else{
+			wlt := ExamWallet(cli, *getBusOrderWallet)
+			if wlt != nil {
 				getInfo := &GetInfo{base64.StdEncoding.EncodeToString(wlt.PublicKey)}
 				getInfo.GetBusinessOrder()
 			}
@@ -186,11 +203,64 @@ func (cli *Cli) Run() {
 		}
 	}
 
+	if getBusPostCmd.Parsed() {
+		if *getBusPostWallet != "" {
+			wlt := ExamWallet(cli, *getBusPostWallet)
+			if wlt != nil {
+				getInfo := &GetInfo{base64.StdEncoding.EncodeToString(wlt.PublicKey)}
+				getInfo.GetBusinessPost()
+			}
+		}else{
+			getBusPostCmd.Usage()
+			os.Exit(1)
+		}
+	}
 
+	if placeOrderCmd.Parsed() {
+		if *placeOrderWallet != "" && *placeOrderId != ""{
+			wlt := ExamWallet(cli, *placeOrderWallet)
+			if wlt != nil {
+				order := &Order{*placeOrderId}
+				order.PlaceOrder(*wlt)
+			}
 
+		} else {
+			placeOrderCmd.Usage()
+			os.Exit(1)
+		}
+	}
 
+	if confirmOrderCmd.Parsed() {
+		if *confirmOrderId != "" && *confirmOrderWallet != ""{
+			wlt := ExamWallet(cli, *confirmOrderWallet)
+			if wlt != nil {
+				order := &Order{*confirmOrderId}
+				order.ConfirmOrder(*wlt)
+			}
 
+		} else {
+			confirmOrderCmd.Usage()
+			os.Exit(1)
+		}
+	}
 }
+
+/**
+	读取钱包信息
+ */
+func ExamWallet(cli *Cli, wltName string) *wallet.Wallet{
+	wlt, e := wallet.ExamWallet(wltName)
+	if e != nil {
+		util.LogE(e)
+		cli.printUsage()
+		return nil
+	} else {
+		return &wlt
+	}
+}
+
+type exist func()
+
 
 /**
 	验证命令行参数
@@ -207,14 +277,17 @@ func (cli *Cli) validateArgs() {
  */
 func (cli *Cli) printUsage() {
 	fmt.Println("用法：")
-	fmt.Println("    (创建钱包）createwallet -name mike ")
-	fmt.Println("    (打印全部钱包名称) getwallets")
-	fmt.Println("    (客户注册)registerc -w mike -name mike -nn mk -age 18 -tel 13812345678 -id 110101199001010000")
-	fmt.Println("    (商家注册)registerb -w mike -name mike -nn mk -age 18 -tel 13812345678 -id 110101199001010000 -bid 50001000-3 -bn 北京城市网邻信息技术有限公司")
+	fmt.Println("    （创建钱包）createwallet -name mike ")
+	fmt.Println("    （打印全部钱包名称） getwallets")
+	fmt.Println("    （客户注册）registerc -w mike -name mike -nn mk -age 18 -tel 13812345678 -id 110101199001010000")
+	fmt.Println("    （商家注册）registerb -w mike -name mike -nn mk -age 18 -tel 13812345678 -id 110101199001010000 -bid 50001000-3 -bn 北京城市网邻信息技术有限公司")
 	fmt.Println("    （发布帖子）createpost -w mike -title 哥俩好搬家公司 -content 负责朝阳区搬家业务 -price 200 -city 北京")
 	fmt.Println("    （获取合约列表）getchaincode")
-	fmt.Println("    （用户获取订单列表）getcusorder")
-	fmt.Println("    （商家获取订单列表）getbusorder")
+	fmt.Println("    （用户获取订单列表）getcusorder -w mike")
+	fmt.Println("    （商家获取订单列表）getbusorder -w mike")
+	fmt.Println("    （商家获取已发布信息）getbuspost -w mike")
+	fmt.Println("    （客户提单）placeorder -w mike -id postId")
+	fmt.Println("    （商家确认订单）confirmorder -w mike -id orderId")
 }
 
 /**
