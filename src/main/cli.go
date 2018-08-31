@@ -15,6 +15,7 @@ const (
 	name              = "name"
 	registerCustom    = "registerc"
 	registerBussiness = "registerb"
+	getUser = "getuser"
 	walletName        = "w"
 	id                = "id"
 	nickname          = "nn"
@@ -68,6 +69,10 @@ func (cli *Cli) Run() {
 	regBWallet := registerBusCmd.String(walletName, "", "在-w后输入钱包名")
 	regBBussinessId := registerBusCmd.String(bussinessId, "", "在-bid后输入组织机构代码")
 	regBBussinessName := registerBusCmd.String(bussinessName, "", "在-bn后输入公司名称")
+
+	//获取用户信息
+	getUserCmd := flag.NewFlagSet(getUser, flag.ExitOnError)
+	getUserWallet := getUserCmd.String(name, "", "在-w后输入钱包名")
 
 	//创建帖子
 	postCmd := flag.NewFlagSet(createPost, flag.ExitOnError)
@@ -127,6 +132,8 @@ func (cli *Cli) Run() {
 		err = placeOrderCmd.Parse(os.Args[2:])
 	case confirmOrder:
 		err = confirmOrderCmd.Parse(os.Args[2:])
+	case getUser:
+		err = getUserCmd.Parse(os.Args[2:])
 	}
 
 	util.LogE(err)
@@ -164,6 +171,20 @@ func (cli *Cli) Run() {
 			os.Exit(1)
 		}
 	}
+
+	if getUserCmd.Parsed()  {
+		if *getUserWallet != ""{
+			wlt, e := wallet.ExamWallet(*getUserWallet)
+			if e != nil {
+				reg := &Register{}
+				reg.GetUserInfo(wlt)
+			}
+		}else{
+			registerCusCmd.Usage()
+			os.Exit(1)
+		}
+	}
+
 
 	if postCmd.Parsed() {
 		if *postCity  != "" && *postContent  != "" && *postPrice  != "" && *postTitle  != "" && *postWallet != ""{
@@ -277,16 +298,21 @@ func (cli *Cli) validateArgs() {
  */
 func (cli *Cli) printUsage() {
 	fmt.Println("用法：")
+	fmt.Println("-----------------------------------钱包---------------------------------------------------------")
+
 	fmt.Println("    （创建钱包）createwallet -name mike ")
 	fmt.Println("    （打印全部钱包名称） getwallets")
-	fmt.Println("    （客户注册）registerc -w mike -name mike -nn mk -age 18 -tel 13812345678 -id 110101199001010000")
+	fmt.Println("-----------------------------------注册/修改-------------------------------------------------------")
+	fmt.Println("    （用户注册）registerc -w mike -name mike -nn mk -age 18 -tel 13812345678 -id 110101199001010000")
 	fmt.Println("    （商家注册）registerb -w mike -name mike -nn mk -age 18 -tel 13812345678 -id 110101199001010000 -bid 50001000-3 -bn 北京城市网邻信息技术有限公司")
-	fmt.Println("    （发布帖子）createpost -w mike -title 哥俩好搬家公司 -content 负责朝阳区搬家业务 -price 200 -city 北京")
+	fmt.Println("    （查询用户信息）getuser -w mike)")
+	fmt.Println("-----------------------------------信息-------------------------------------------------------")
+	fmt.Println("    （发布信息）createpost -w mike -title 哥俩好搬家公司 -content 负责朝阳区搬家业务 -price 200 -city 北京")
 	fmt.Println("    （获取合约列表）getchaincode")
 	fmt.Println("    （用户获取订单列表）getcusorder -w mike")
 	fmt.Println("    （商家获取订单列表）getbusorder -w mike")
 	fmt.Println("    （商家获取已发布信息）getbuspost -w mike")
-	fmt.Println("    （客户提单）placeorder -w mike -id postId")
+	fmt.Println("    （用户提单）placeorder -w mike -id postId")
 	fmt.Println("    （商家确认订单）confirmorder -w mike -id orderId")
 }
 
@@ -318,6 +344,7 @@ func (cli *Cli) register(walletName string, user *Register) {
 		cli.printUsage()
 	}else{
 		user.RegisterCommit(wlt)
+
 	}
 
 }

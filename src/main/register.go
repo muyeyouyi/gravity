@@ -9,11 +9,11 @@ import (
 )
 
 type Register struct {
-	Nickname string `json:"Nickname"`
-	Name     string `json:"Name"`
-	Age      string `json:"Age"`
-	Phonenum string `json:"Phonenum"`
-	ID       string `json:"ID"`
+	Nickname    string `json:"Nickname"`
+	Name        string `json:"Name"`
+	Age         string `json:"Age"`
+	Phonenum    string `json:"Phonenum"`
+	ID          string `json:"ID"`
 	CompanyID   string `json:"CompanyID"`
 	CompanyName string `json:"CompanyName"`
 }
@@ -21,16 +21,16 @@ type Register struct {
 /**
 	注册
  */
-func (user *Register)RegisterCommit(wlt wallet.Wallet) {
+func (user *Register) RegisterCommit(wlt wallet.Wallet) {
 	//字段加密
-	user.Name = util.AesAndBase64Encode(user.Name,wlt.AesKey)
-	user.Phonenum = util.AesAndBase64Encode(user.Phonenum,wlt.AesKey)
-	user.ID = util.AesAndBase64Encode(user.ID,wlt.AesKey)
-	user.Age = util.AesAndBase64Encode(user.Age,wlt.AesKey)
+	user.Name = util.AesAndBase64Encode(user.Name, wlt.AesKey)
+	user.Phonenum = util.AesAndBase64Encode(user.Phonenum, wlt.AesKey)
+	user.ID = util.AesAndBase64Encode(user.ID, wlt.AesKey)
+	user.Age = util.AesAndBase64Encode(user.Age, wlt.AesKey)
 	if user.CompanyID != "" {
-		user.CompanyID = util.AesAndBase64Encode(user.CompanyID,wlt.AesKey)
+		user.CompanyID = util.AesAndBase64Encode(user.CompanyID, wlt.AesKey)
 	}
-	fmt.Println("加密：",*user)
+	fmt.Println("加密：", *user)
 
 	//生成json
 	jsonByte, e := json.Marshal(user)
@@ -41,27 +41,45 @@ func (user *Register)RegisterCommit(wlt wallet.Wallet) {
 
 	//签名
 	args := Sign(wlt, string(jsonByte))
+	args[constant.Args0] = constant.Set
+	args[constant.RequestType] = constant.Invoke
+	args[constant.ChainCodeName] = constant.User
 
 	//网络请求
-	util.PostTest(constant.BaseUrl,args)
-
-
-	////测试验证签名
-	//for key, value := range args {
-	//	fmt.Println("key:",key,"  value:",value)
-	//}
-	//verify := util.Verify(args["args0"], args["args1"], args["args2"])
-	//fmt.Println("veryfy:",verify)
-
-	////测试解密
-	//user.Name = util.AesAndBase64Decode(user.Name,wlt.AesKey)
-	//user.Phonenum = util.AesAndBase64Decode(user.Phonenum,wlt.AesKey)
-	//user.ID = util.AesAndBase64Decode(user.ID,wlt.AesKey)
-	//user.Age = util.AesAndBase64Decode(user.Age,wlt.AesKey)
-	//if user.CompanyID != "" {
-	//	user.CompanyID = util.AesAndBase64Decode(user.CompanyID,wlt.AesKey)
-	//}
-	//fmt.Println("解密:",*user)
+	util.PostTest(constant.BaseUrl, args)
 
 }
 
+/**
+	获取用户信息
+ */
+func (user *Register) GetUserInfo(wlt wallet.Wallet) {
+	args := make(map[string]string)
+	args[constant.RequestType] = constant.Query
+	args[constant.ChainCodeName] = constant.User
+	args[constant.Args0] = constant.Get
+	args[constant.Args1] = util.Base64(wlt.PublicKey)
+	res := util.PostTest(constant.BaseUrl, args)
+
+	var userInfo Register
+	json.Unmarshal(res,&userInfo)
+	userInfo.ID = util.AesAndBase64Decode(userInfo.ID,wlt.AesKey)
+	userInfo.Name = util.AesAndBase64Decode(userInfo.Name,wlt.AesKey)
+	userInfo.Age = util.AesAndBase64Decode(userInfo.Age,wlt.AesKey)
+	userInfo.Phonenum = util.AesAndBase64Decode(userInfo.Phonenum,wlt.AesKey)
+	if userInfo.CompanyID != "" {
+		userInfo.CompanyID = util.AesAndBase64Decode(userInfo.CompanyID,wlt.AesKey)
+	}
+
+	fmt.Println("用户信息：")
+	fmt.Println("昵称：",userInfo.Nickname)
+	fmt.Println("姓名：",userInfo.Name)
+	fmt.Println("年龄：",userInfo.Age)
+	fmt.Println("电话：",userInfo.Phonenum)
+	fmt.Println("身份证号：",userInfo.ID)
+	if userInfo.CompanyName != "" {
+		fmt.Println("企业名称：",userInfo.CompanyName)
+		fmt.Println("法人登记证号：",userInfo.CompanyID)
+	}
+
+}

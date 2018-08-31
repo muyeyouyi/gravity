@@ -69,3 +69,7 @@ func AesAndBase64Decode(info string,key []byte) string  {
 	LogE(e)
 	return string(decrypt)
 }
+
+func Base64(pubkey []byte) string  {
+	return base64.StdEncoding.EncodeToString(pubkey)
+}

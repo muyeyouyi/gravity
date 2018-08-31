@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"encoding/base64"
+	"constant"
 )
 
 /**
@@ -13,14 +14,14 @@ import (
  */
 func Sign(wlt wallet.Wallet,content string) map[string]string{
 	args:= make(map[string]string)
-	args["args0"] = base64.StdEncoding.EncodeToString(wlt.PublicKey)
-	args["args1"] = content
+	args[constant.Args1] = base64.StdEncoding.EncodeToString(wlt.PublicKey)
+	args[constant.Args2] = content
 	r, s, err := ecdsa.Sign(rand.Reader, &wlt.PrivateKey, []byte(content))
 	if err != nil {
 		fmt.Println(err)
 	}
 	signature := append(r.Bytes(), s.Bytes()...)
-	args["args2"] = base64.StdEncoding.EncodeToString(signature)
-	args["accessToken"] = AccessToken
+	args[constant.Args3] = base64.StdEncoding.EncodeToString(signature)
+	args[constant.AccessToken] = AccessToken
 	return args
 }
