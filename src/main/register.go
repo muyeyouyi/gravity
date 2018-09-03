@@ -41,12 +41,13 @@ func (user *Register) RegisterCommit(wlt wallet.Wallet) {
 
 	//签名
 	args := Sign(wlt, string(jsonByte))
-	args[constant.Args0] = constant.Set
-	args[constant.RequestType] = constant.Invoke
 	args[constant.ChainCodeName] = constant.User
+	args[constant.Version] = constant.UserVersion
+	args[constant.Function] = constant.Set
+	args[constant.AppId] = constant.AppIdGravity
 
 	//网络请求
-	util.PostTest(constant.BaseUrl, args)
+	util.PostTest1(constant.UrlInvoke, args)
 
 }
 
@@ -55,12 +56,16 @@ func (user *Register) RegisterCommit(wlt wallet.Wallet) {
  */
 func (user *Register) GetUserInfo(wlt wallet.Wallet) {
 	args := make(map[string]string)
-	args[constant.RequestType] = constant.Query
 	args[constant.ChainCodeName] = constant.User
-	args[constant.Args0] = constant.Get
-	args[constant.Args1] = util.Base64(wlt.PublicKey)
-	res := util.PostTest(constant.BaseUrl, args)
+	args[constant.Version] = constant.UserVersion
+	args[constant.Function] = constant.Get
+	args[constant.AppId] = constant.AppIdGravity
+	args[constant.AccessToken] = AccessToken
 
+	args[constant.Args0] = util.Base64(wlt.PublicKey)
+	res := util.PostTest(constant.UrlQuery, args)
+
+	//解析
 	var userInfo Register
 	json.Unmarshal(res,&userInfo)
 	userInfo.ID = util.AesAndBase64Decode(userInfo.ID,wlt.AesKey)

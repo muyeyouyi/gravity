@@ -4,8 +4,8 @@ import (
 	"wallet"
 	"encoding/json"
 	"fmt"
-	"util"
 	"constant"
+	"util"
 )
 
 /**
@@ -14,8 +14,9 @@ import (
 type Post struct {
 	Title       string `json:"Title"`
 	Content     string `json:"Content"`
+	CompanyName string `json:"CompanyName"`
 	City        string `json:"City"`
-	Price       string `json:"Price"`
+	Price       int    `json:"Price"`
 }
 
 func (post *Post) PostCommit(wlt wallet.Wallet) {
@@ -26,5 +27,17 @@ func (post *Post) PostCommit(wlt wallet.Wallet) {
 	}
 
 	args := Sign(wlt, string(jsonByte))
-	util.PostTest(constant.BaseUrl,args)
+	args[constant.Args0] = constant.Set
+	args[constant.Function] = constant.Invoke
+	args[constant.ChainCodeName] = constant.Info
+	util.PostTest(constant.BaseUrl, args)
+}
+
+func (post *Post) GetPosts(pubkey string) {
+	args := make(map[string]string)
+	args[constant.Function] = constant.Query
+	args[constant.ChainCodeName] = constant.Info
+	args[constant.Args0] = constant.GetByOwner
+	args[constant.Args1] = pubkey
+	util.PostTest(constant.BaseUrl, args)
 }

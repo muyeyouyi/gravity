@@ -34,7 +34,7 @@ func (info *GetInfo) GetCustomOrder() {
 }
 
 /**
-	B端拉取订单
+	拉取B端
  */
 func (info *GetInfo) GetBusinessOrder() {
 	args := make(map[string]string)

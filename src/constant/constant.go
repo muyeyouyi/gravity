@@ -1,27 +1,39 @@
 package constant
 
 const (
-	BaseUrl   = "https://baas.58.com/chaincode/query?appId=851158"
-	AppId     = "488737"
-	AppSecret = "34394b5612d3961958ea17920296938a"
+	BaseUrl      = "https://baas.58.com/chaincode/"
+	UrlInvoke      = BaseUrl+"invoke"
+	UrlQuery      = BaseUrl+"query"
+	AppIdGravity = "499169"
+	AppSecret    = "1834b876583b310fb4f2ea363f5a62c4"
 
-	RequestType = "requestType"
-	Args0 = "args0"
-	Args1 = "args1"
-	Args2 = "args2"
-	Args3 = "args3"
-	Args4 = "args4"
+	Function      = "function"
+	Version      = "version"
+	AppId         = "appId"
+	Args0         = "args0"
+	Args1         = "args1"
+	Args2         = "args2"
+	Args3         = "args3"
+	Args4         = "args4"
 	ChainCodeName = "chaincodeName"
-	AccessToken = "accessToken"
+	AccessToken   = "accessToken"
 
-	//RequestType
+	//Function
 	Invoke = "invoke"
-	Query = "query"
+	Query  = "query"
 
 	//ChainCodeName
 	User = "user"
+	Info = "info"
 
 	//Args0
-	Set = "set"
-	Get = "get"
+	Set        = "set"
+	Get        = "get"
+	GetByOwner = "getByOwner"
+
+	//chainCodeVersion
+	UserVersion = "1"
+	InfoVersion = "1"
+	MatchingVersion = "1"
+	TradeVersion = "1"
 )

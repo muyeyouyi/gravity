@@ -7,6 +7,7 @@ import (
 	"util"
 	"wallet"
 	"encoding/base64"
+	"strconv"
 )
 
 const (
@@ -15,7 +16,7 @@ const (
 	name              = "name"
 	registerCustom    = "registerc"
 	registerBussiness = "registerb"
-	getUser = "getuser"
+	getUser           = "getuser"
 	walletName        = "w"
 	id                = "id"
 	nickname          = "nn"
@@ -32,8 +33,9 @@ const (
 	getBusinessOrder  = "getbusorder"
 	getCustomerOrder  = "getcusorder"
 	getBusinessPost   = "getbuspost"
-	placeOrder   = "placeorder"
-	confirmOrder   = "confirmorder"
+	placeOrder        = "placeorder"
+	confirmOrder      = "confirmorder"
+	getPost      = "getpost"
 )
 
 type Cli struct {
@@ -75,12 +77,18 @@ func (cli *Cli) Run() {
 	getUserWallet := getUserCmd.String(name, "", "在-w后输入钱包名")
 
 	//创建帖子
-	postCmd := flag.NewFlagSet(createPost, flag.ExitOnError)
-	postTitle := postCmd.String(title, "", "在-title后输入标题")
-	postContent := postCmd.String(content, "", "在-content后输入帖子内容")
-	postCity := postCmd.String(city, "", "在-city后输入城市")
-	postPrice := postCmd.String(price, "", "在-price后输入价格")
-	postWallet := postCmd.String(walletName, "", "在-w后输入钱包名称")
+	createPostCmd := flag.NewFlagSet(createPost, flag.ExitOnError)
+	postTitle := createPostCmd.String(title, "", "在-title后输入标题")
+	postContent := createPostCmd.String(content, "", "在-content后输入帖子内容")
+	postBusinessName := createPostCmd.String(bussinessName, "", "在-bn后输入公司名称")
+	postCity := createPostCmd.String(city, "", "在-city后输入城市")
+	postPrice := createPostCmd.String(price, "", "在-price后输入价格")
+	postWallet := createPostCmd.String(walletName, "", "在-w后输入钱包名称")
+
+	//查询帖子
+	getPostsCmd := flag.NewFlagSet(getPost, flag.ExitOnError)
+	getPostsWallet := getPostsCmd.String(title, "", "在-w后输入钱包名称")
+
 
 	//获取链码列表
 	getChainCodeCmd := flag.NewFlagSet(getChainCodeList, flag.ExitOnError)
@@ -119,7 +127,7 @@ func (cli *Cli) Run() {
 	case registerBussiness:
 		err = registerBusCmd.Parse(os.Args[2:])
 	case createPost:
-		err = postCmd.Parse(os.Args[2:])
+		err = createPostCmd.Parse(os.Args[2:])
 	case getChainCodeList:
 		err = getChainCodeCmd.Parse(os.Args[2:])
 	case getCustomerOrder:
@@ -134,10 +142,15 @@ func (cli *Cli) Run() {
 		err = confirmOrderCmd.Parse(os.Args[2:])
 	case getUser:
 		err = getUserCmd.Parse(os.Args[2:])
+	case getPost:
+		err = getPostsCmd.Parse(os.Args[2:])
 	}
 
 	util.LogE(err)
 
+	/**
+		创建钱包
+	 */
 	if createWalletCmd.Parsed() {
 		if *createWalletData == "" {
 			createWalletCmd.Usage()
@@ -149,50 +162,72 @@ func (cli *Cli) Run() {
 	if getWalletsCmd.Parsed() {
 		cli.printWallets()
 	}
-
-	if registerCusCmd.Parsed()  {
-		if *regWallet != "" && *regName != "" && *regNickName != ""  && *regID != "" && *regAge != "" && *regTel != ""{
+	/**
+		用户注册
+	 */
+	if registerCusCmd.Parsed() {
+		if *regWallet != "" && *regName != "" && *regNickName != "" && *regID != "" && *regAge != "" && *regTel != "" {
 			userInfo := &Register{*regNickName, *regName, *regAge, *regTel, *regID, "", ""}
 			fmt.Println(*userInfo)
-			cli.register(*regWallet,userInfo)
-		}else{
+			cli.register(*regWallet, userInfo)
+		} else {
 			registerCusCmd.Usage()
 			os.Exit(1)
 		}
 	}
-
-	if registerBusCmd.Parsed()  {
-		if *regBWallet != "" && *regBName != "" && *regBNickName != ""  && *regBID != "" && *regBAge != "" && *regBTel != "" && *regBBussinessName != "" && *regBBussinessId != ""{
+	/**
+		商家注册
+	 */
+	if registerBusCmd.Parsed() {
+		if *regBWallet != "" && *regBName != "" && *regBNickName != "" && *regBID != "" && *regBAge != "" && *regBTel != "" && *regBBussinessName != "" && *regBBussinessId != "" {
 			userInfo := &Register{*regBNickName, *regBName, *regBAge, *regBTel, *regBID, *regBBussinessId, *regBBussinessName}
 			fmt.Println(*userInfo)
-			cli.register(*regBWallet,userInfo)
-		}else{
+			cli.register(*regBWallet, userInfo)
+		} else {
 			registerCusCmd.Usage()
 			os.Exit(1)
 		}
 	}
 
-	if getUserCmd.Parsed()  {
-		if *getUserWallet != ""{
+	/**
+		获取用户信息
+	 */
+	if getUserCmd.Parsed() {
+		if *getUserWallet != "" {
 			wlt, e := wallet.ExamWallet(*getUserWallet)
 			if e != nil {
 				reg := &Register{}
 				reg.GetUserInfo(wlt)
 			}
-		}else{
+		} else {
 			registerCusCmd.Usage()
 			os.Exit(1)
 		}
 	}
 
-
-	if postCmd.Parsed() {
-		if *postCity  != "" && *postContent  != "" && *postPrice  != "" && *postTitle  != "" && *postWallet != ""{
-			post := &Post{*postTitle, *postContent, *postCity, *postPrice}
-			fmt.Println(*post)
-			cli.createPost(*postWallet,post)
+	/**
+		商家发布信息
+	 */
+	if createPostCmd.Parsed() {
+		if *postCity != "" && *postContent != "" && *postPrice != "" && *postTitle != "" && *postWallet != "" && *postBusinessName != "" {
+			price, e := strconv.Atoi(*postPrice)
+			if e != nil {
+				fmt.Println(e)
+			} else {
+				post := &Post{*postTitle, *postContent, *postBusinessName, *postCity, price}
+				fmt.Println(*post)
+				cli.createPost(*postWallet, post)
+			}
 		}
 	}
+
+	if	getPostsCmd.Parsed(){
+		if *getPostsWallet != ""{
+			post := &Post{}
+			post.GetPosts(*getPostsWallet)
+		}
+	}
+
 	if getChainCodeCmd.Parsed() {
 		getInfo := &GetInfo{}
 		getInfo.GetChainCodeList()
@@ -205,12 +240,15 @@ func (cli *Cli) Run() {
 				getInfo := &GetInfo{base64.StdEncoding.EncodeToString(wlt.PublicKey)}
 				getInfo.GetCustomOrder()
 			}
-		}else{
+		} else {
 			getCusOrderCmd.Usage()
 			os.Exit(1)
 		}
 	}
 
+	/**
+		根据商家获取信息列表
+	 */
 	if getBusOrderCmd.Parsed() {
 		if *getBusOrderWallet != "" {
 			wlt := ExamWallet(cli, *getBusOrderWallet)
@@ -218,7 +256,7 @@ func (cli *Cli) Run() {
 				getInfo := &GetInfo{base64.StdEncoding.EncodeToString(wlt.PublicKey)}
 				getInfo.GetBusinessOrder()
 			}
-		}else{
+		} else {
 			getBusOrderCmd.Usage()
 			os.Exit(1)
 		}
@@ -231,14 +269,14 @@ func (cli *Cli) Run() {
 				getInfo := &GetInfo{base64.StdEncoding.EncodeToString(wlt.PublicKey)}
 				getInfo.GetBusinessPost()
 			}
-		}else{
+		} else {
 			getBusPostCmd.Usage()
 			os.Exit(1)
 		}
 	}
 
 	if placeOrderCmd.Parsed() {
-		if *placeOrderWallet != "" && *placeOrderId != ""{
+		if *placeOrderWallet != "" && *placeOrderId != "" {
 			wlt := ExamWallet(cli, *placeOrderWallet)
 			if wlt != nil {
 				order := &Order{*placeOrderId}
@@ -252,7 +290,7 @@ func (cli *Cli) Run() {
 	}
 
 	if confirmOrderCmd.Parsed() {
-		if *confirmOrderId != "" && *confirmOrderWallet != ""{
+		if *confirmOrderId != "" && *confirmOrderWallet != "" {
 			wlt := ExamWallet(cli, *confirmOrderWallet)
 			if wlt != nil {
 				order := &Order{*confirmOrderId}
@@ -269,7 +307,7 @@ func (cli *Cli) Run() {
 /**
 	读取钱包信息
  */
-func ExamWallet(cli *Cli, wltName string) *wallet.Wallet{
+func ExamWallet(cli *Cli, wltName string) *wallet.Wallet {
 	wlt, e := wallet.ExamWallet(wltName)
 	if e != nil {
 		util.LogE(e)
@@ -281,7 +319,6 @@ func ExamWallet(cli *Cli, wltName string) *wallet.Wallet{
 }
 
 type exist func()
-
 
 /**
 	验证命令行参数
@@ -307,10 +344,14 @@ func (cli *Cli) printUsage() {
 	fmt.Println("    （商家注册）registerb -w mike -name mike -nn mk -age 18 -tel 13812345678 -id 110101199001010000 -bid 50001000-3 -bn 北京城市网邻信息技术有限公司")
 	fmt.Println("    （查询用户信息）getuser -w mike)")
 	fmt.Println("-----------------------------------信息-------------------------------------------------------")
-	fmt.Println("    （发布信息）createpost -w mike -title 哥俩好搬家公司 -content 负责朝阳区搬家业务 -price 200 -city 北京")
+	fmt.Println("    （发布信息）createpost -w mike -title 北京地区搬家 -bn 哥俩好搬家公司 -content 负责朝阳区搬家业务 -price 200 -city 北京 ")
+	fmt.Println("    （根据商家获取信息列表）getbusorder -w mike")
+
+
+
 	fmt.Println("    （获取合约列表）getchaincode")
 	fmt.Println("    （用户获取订单列表）getcusorder -w mike")
-	fmt.Println("    （商家获取订单列表）getbusorder -w mike")
+
 	fmt.Println("    （商家获取已发布信息）getbuspost -w mike")
 	fmt.Println("    （用户提单）placeorder -w mike -id postId")
 	fmt.Println("    （商家确认订单）confirmorder -w mike -id orderId")
@@ -342,7 +383,7 @@ func (cli *Cli) register(walletName string, user *Register) {
 	if e != nil {
 		util.LogE(e)
 		cli.printUsage()
-	}else{
+	} else {
 		user.RegisterCommit(wlt)
 
 	}
@@ -357,11 +398,8 @@ func (cli *Cli) createPost(walletName string, post *Post) {
 	if e != nil {
 		util.LogE(e)
 		cli.printUsage()
-	}else{
+	} else {
 		post.PostCommit(wlt)
 	}
 
 }
-
-
-

@@ -13,6 +13,7 @@ var AccessToken string
 func main() {
 	getAccessToken()
 	cli()
+
 }
 
 func getAccessToken() {
@@ -25,7 +26,7 @@ func getAccessToken() {
 		Data Data `json:"data"`
 	}
 	orgs := make(map[string]string)
-	orgs["appId"] = constant.AppId
+	orgs[constant.AppId] = constant.AppIdGravity
 	orgs["appSecret"] = constant.AppSecret
 	response := util.PostTest("https://baas.58.com/token/clientCredentials?", orgs)
 	var res Response
