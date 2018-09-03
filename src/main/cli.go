@@ -30,12 +30,16 @@ const (
 	city              = "city"
 	price             = "price"
 	getChainCodeList  = "getchaincode"
+	useChainCode      = "usechaincode"
 	getBusinessOrder  = "getbusorder"
 	getCustomerOrder  = "getcusorder"
 	getBusinessPost   = "getbuspost"
 	placeOrder        = "placeorder"
 	confirmOrder      = "confirmorder"
-	getPost      = "getpost"
+	getPost           = "getpost"
+	getPostDetail     = "getpostdetail"
+	lowPrice          = "lowp"
+	highPrice         = "highp"
 )
 
 type Cli struct {
@@ -85,13 +89,25 @@ func (cli *Cli) Run() {
 	postPrice := createPostCmd.String(price, "", "在-price后输入价格")
 	postWallet := createPostCmd.String(walletName, "", "在-w后输入钱包名称")
 
-	//查询帖子
+	//查询商家帖子列表
 	getPostsCmd := flag.NewFlagSet(getPost, flag.ExitOnError)
 	getPostsWallet := getPostsCmd.String(title, "", "在-w后输入钱包名称")
 
+	//查询帖子详情
+	getPostDetailCmd := flag.NewFlagSet(getPostDetail, flag.ExitOnError)
+	getPostDetailId := getPostDetailCmd.String(id, "", "在-id后输入信息ID")
+
+	//todo
 
 	//获取链码列表
 	getChainCodeCmd := flag.NewFlagSet(getChainCodeList, flag.ExitOnError)
+
+	//使用链码匹配
+	useChainCodeCmd := flag.NewFlagSet(useChainCode, flag.ExitOnError)
+	useChainCodeId := useChainCodeCmd.String(id, "", "在-w后输入钱包名称")
+	useChainCodeCity := useChainCodeCmd.String(city, "", "在-w后输入钱包名称")
+	useChainCodeLowPrice := useChainCodeCmd.String(lowPrice, "", "在-lowp后输入最低价格")
+	useChainCodeHighPrice := useChainCodeCmd.String(highPrice, "", "在-highp后输入最高价格")
 
 	//C获取订单列表
 	getCusOrderCmd := flag.NewFlagSet(getCustomerOrder, flag.ExitOnError)
@@ -144,6 +160,10 @@ func (cli *Cli) Run() {
 		err = getUserCmd.Parse(os.Args[2:])
 	case getPost:
 		err = getPostsCmd.Parse(os.Args[2:])
+	case getPostDetail:
+		err = getPostDetailCmd.Parse(os.Args[2:])
+	case useChainCode:
+		err = useChainCodeCmd.Parse(os.Args[2:])
 	}
 
 	util.LogE(err)
@@ -221,16 +241,41 @@ func (cli *Cli) Run() {
 		}
 	}
 
-	if	getPostsCmd.Parsed(){
-		if *getPostsWallet != ""{
+	/**
+		获取一个商家所有帖子列表
+	 */
+	if getPostsCmd.Parsed() {
+		if *getPostsWallet != "" {
 			post := &Post{}
 			post.GetPosts(*getPostsWallet)
 		}
 	}
 
+	/**
+		查询帖子详情
+	 */
+	if getPostDetailCmd.Parsed() {
+		if *getPostDetailId != "" {
+			post := &Post{}
+			post.GetPostDetail(*getPostDetailId)
+		}
+	}
+
+	/**
+		获取合约列表
+	 */
 	if getChainCodeCmd.Parsed() {
-		getInfo := &GetInfo{}
-		getInfo.GetChainCodeList()
+		match := &Match{}
+		match.GetMatchList()
+	}
+	if useChainCodeCmd.Parsed() {
+		if *useChainCodeCity != "" && *useChainCodeId != "" && *useChainCodeLowPrice != "" && *useChainCodeHighPrice != "" {
+			match := &Match{}
+			match.Match(*useChainCodeCity,*useChainCodeId,*useChainCodeLowPrice,*useChainCodeHighPrice)
+		}else{
+			useChainCodeCmd.Usage()
+			os.Exit(1)
+		}
 	}
 
 	if getCusOrderCmd.Parsed() {
@@ -346,10 +391,12 @@ func (cli *Cli) printUsage() {
 	fmt.Println("-----------------------------------信息-------------------------------------------------------")
 	fmt.Println("    （发布信息）createpost -w mike -title 北京地区搬家 -bn 哥俩好搬家公司 -content 负责朝阳区搬家业务 -price 200 -city 北京 ")
 	fmt.Println("    （根据商家获取信息列表）getbusorder -w mike")
-
-
-
+	fmt.Println("    （根据信息ID查询信息）getorderdetail -id id")
+	fmt.Println("-----------------------------------合约-------------------------------------------------------")
 	fmt.Println("    （获取合约列表）getchaincode")
+	fmt.Println("    （匹配）usechaincode -id 链码id -city 北京 -lowp 50 -highp 1000")
+	fmt.Println("-----------------------------------订单-------------------------------------------------------")
+
 	fmt.Println("    （用户获取订单列表）getcusorder -w mike")
 
 	fmt.Println("    （商家获取已发布信息）getbuspost -w mike")
