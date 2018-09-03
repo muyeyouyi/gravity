@@ -13,7 +13,7 @@ type Match struct {
  */
 func (match *Match) GetMatchList() {
 	args := make(map[string]string)
-	args[constant.ChainCodeName] = constant.Matching
+	args[constant.ChainCodeName] = constant.ChainCodeMatching
 	args[constant.Version] = constant.MatchingVersion
 	args[constant.Function] = constant.MatchingList
 	args[constant.AppId] = constant.AppIdGravity
@@ -27,7 +27,7 @@ func (match *Match) GetMatchList() {
  */
 func (match *Match) Match(city, id, lowPrice, highPrice string) {
 	args := make(map[string]string)
-	args[constant.ChainCodeName] = constant.Info
+	args[constant.ChainCodeName] = constant.ChainCodeInfo
 	args[constant.Version] = constant.InfoVersion
 	args[constant.Function] = constant.Matching
 	args[constant.AppId] = constant.AppIdGravity

@@ -32,7 +32,7 @@ func (post *Post) PostCommit(wlt wallet.Wallet) {
 	args := Sign(wlt, string(jsonByte))
 	args[constant.Function] = constant.Set
 	args[constant.Version] = constant.InfoVersion
-	args[constant.ChainCodeName] = constant.Info
+	args[constant.ChainCodeName] = constant.ChainCodeInfo
 	args[constant.AppId] = constant.AppIdGravity
 	util.PostTest(constant.UrlInvoke, args)
 }
@@ -42,7 +42,7 @@ func (post *Post) PostCommit(wlt wallet.Wallet) {
  */
 func (post *Post) GetPosts(pubkey string) {
 	args := make(map[string]string)
-	args[constant.ChainCodeName] = constant.Info
+	args[constant.ChainCodeName] = constant.ChainCodeInfo
 	args[constant.Version] = constant.InfoVersion
 	args[constant.Function] = constant.GetByOwner
 	args[constant.AppId] = constant.AppIdGravity
@@ -57,7 +57,7 @@ func (post *Post) GetPosts(pubkey string) {
  */
 func (post *Post) GetPostDetail(ID string) {
 	args := make(map[string]string)
-	args[constant.ChainCodeName] = constant.Info
+	args[constant.ChainCodeName] = constant.ChainCodeInfo
 	args[constant.Version] = constant.InfoVersion
 	args[constant.Function] = constant.Get
 	args[constant.AppId] = constant.AppIdGravity

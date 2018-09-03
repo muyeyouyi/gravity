@@ -14,7 +14,6 @@ const (
 	Args1         = "args1"
 	Args2         = "args2"
 	Args3         = "args3"
-	Args4         = "args4"
 	ChainCodeName = "chaincodeName"
 	AccessToken   = "accessToken"
 
@@ -23,19 +22,25 @@ const (
 	//Query  = "query"
 
 	//ChainCodeName
-	User = "user"
-	Info = "info"
-
+	ChainCodeUser     = "user"
+	ChainCodeInfo     = "info"
+	ChainCodeTrade    = "trade"
+	ChainCodeMatching = "matching"
 	//Function
-	Set        = "set"
-	Get        = "get"
-	GetByOwner = "getByOwner"
-	Matching   = "matching"
-	MatchingList   = "matchingList"
+	Set          = "set"
+	Get          = "get"
+	GetByOwner   = "getByOwner"
+	Matching     = "matching"
+	MatchingList = "matchingList"
+	Submit       = "submit"
+	Confirm       = "confirm"
+	Finish       = "finish"
+	GetTradeByConstumer       = "getTradeByConstumer"
+	GetTradeByBusiness       = "getTradeByBusiness"
 
 	//chainCodeVersion
 	UserVersion     = "1"
 	InfoVersion     = "1"
 	MatchingVersion = "1"
-	TradeVersion    = "1"
+	TradeVersion    = "2"
 )

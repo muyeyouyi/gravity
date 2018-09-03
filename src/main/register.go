@@ -41,7 +41,7 @@ func (user *Register) RegisterCommit(wlt wallet.Wallet) {
 
 	//签名
 	args := Sign(wlt, string(jsonByte))
-	args[constant.ChainCodeName] = constant.User
+	args[constant.ChainCodeName] = constant.ChainCodeUser
 	args[constant.Version] = constant.UserVersion
 	args[constant.Function] = constant.Set
 	args[constant.AppId] = constant.AppIdGravity
@@ -56,7 +56,7 @@ func (user *Register) RegisterCommit(wlt wallet.Wallet) {
  */
 func (user *Register) GetUserInfo(wlt wallet.Wallet) {
 	args := make(map[string]string)
-	args[constant.ChainCodeName] = constant.User
+	args[constant.ChainCodeName] = constant.ChainCodeUser
 	args[constant.Version] = constant.UserVersion
 	args[constant.Function] = constant.Get
 	args[constant.AppId] = constant.AppIdGravity
