@@ -8,6 +8,12 @@ import (
 	"constant"
 	"log"
 )
+type Response struct {
+	Status int `json:"status"`
+	Message string `json:"message"`
+	BlockNumber string `json:"blockNumber"`
+	Data []string `json:"data"`
+}
 
 type Register struct {
 	Nickname    string `json:"Nickname"`
@@ -75,10 +81,17 @@ func analysis(res []byte, wlt wallet.Wallet) {
 			log.Fatalln("error:json解析异常")
 		}
 	}()
+	var response Response
+	json.Unmarshal(res, &response)
+	if response.Status != 200 {
+		panic("请求失败！")
+	}
+	info := response.Data[0]
+	//fmt.Println("info:",info)
 
 	//解析
 	var userInfo Register
-	json.Unmarshal(res, &userInfo)
+	json.Unmarshal([]byte(info), &userInfo)
 	userInfo.ID = util.AesAndBase64Decode(userInfo.ID, wlt.AesKey)
 	userInfo.Name = util.AesAndBase64Decode(userInfo.Name, wlt.AesKey)
 	userInfo.Age = util.AesAndBase64Decode(userInfo.Age, wlt.AesKey)

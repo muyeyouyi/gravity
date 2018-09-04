@@ -35,7 +35,7 @@ const (
 	GetTradeByBusiness       = "getTradeByBusiness"
 
 	//chainCodeVersion
-	UserVersion     = "9"
+	UserVersion     = "11"
 	InfoVersion     = "8"
 	MatchingVersion = "8"
 	TradeVersion    = "8"
