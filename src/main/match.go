@@ -17,7 +17,6 @@ func (match *Match) GetMatchList() {
 	args[constant.Version] = constant.MatchingVersion
 	args[constant.Function] = constant.MatchingList
 	args[constant.AppId] = constant.AppIdGravity
-	args[constant.AccessToken] = AccessToken
 
 	util.PostTest(constant.UrlQuery, args)
 }
@@ -31,7 +30,6 @@ func (match *Match) Match(city, id, lowPrice, highPrice string) {
 	args[constant.Version] = constant.InfoVersion
 	args[constant.Function] = constant.Matching
 	args[constant.AppId] = constant.AppIdGravity
-	args[constant.AccessToken] = AccessToken
 
 	args[constant.Args0] = id
 	args[constant.Args1] = city

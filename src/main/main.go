@@ -4,35 +4,16 @@ import (
 	"crypto/sha256"
 	"util"
 	"fmt"
-	"constant"
-	"encoding/json"
 )
 
-var AccessToken string
+
 
 func main() {
-	getAccessToken()
 	cli()
 
 }
 
-func getAccessToken() {
-	type Data struct {
-		ExpireIn    int    `json:"expireIn"`
-		AccessToken string `json:"accessToken"`
-	}
-	type Response struct {
-		Code int  `json:"code"`
-		Data Data `json:"data"`
-	}
-	orgs := make(map[string]string)
-	orgs[constant.AppId] = constant.AppIdGravity
-	orgs["appSecret"] = constant.AppSecret
-	response := util.PostTest("https://baas.58.com/token/clientCredentials?", orgs)
-	var res Response
-	json.Unmarshal(response, &res)
-	AccessToken = res.Data.AccessToken
-}
+
 
 func test() {
 	//s := "dfzdfz"

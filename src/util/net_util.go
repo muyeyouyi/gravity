@@ -6,9 +6,12 @@ import (
 	"io/ioutil"
 	"strings"
 	"net/url"
+	"constant"
+	"encoding/json"
 )
 
-func PostTest(questUrl string,args map[string]string)[]byte {
+
+func PostAccessToken(questUrl string,args map[string]string)[]byte {
 	fullUrl := questUrl
 	for key, value := range args {
 		fullUrl+= key
@@ -18,12 +21,12 @@ func PostTest(questUrl string,args map[string]string)[]byte {
 	}
 	//fmt.Println("url0:",fullUrl)
 	fullUrl = string(([]byte(fullUrl))[:len(fullUrl)-1])
-	fmt.Println("url:",fullUrl)
+	//fmt.Println("url:",fullUrl)
 
 	u, _ := url.Parse(fullUrl)
 	q := u.Query()
 	u.RawQuery = q.Encode()
-	fmt.Println("urlparse:",u.String())
+	//fmt.Println("urlparse:",u.String())
 
 	resp, err := http.Post(u.String(),
 		"application/x-www-form-urlencoded",
@@ -37,12 +40,14 @@ func PostTest(questUrl string,args map[string]string)[]byte {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("response:",string(body))
+	//fmt.Println("response:",string(body))
 	return body
 }
 
 
-func PostTest1(questUrl string,args map[string]string)[]byte {
+func PostTest(questUrl string,args map[string]string)[]byte {
+	args[constant.AccessToken] = getAccessToken()
+
 	var params string
 	for key, value := range args {
 		params += key
@@ -87,4 +92,22 @@ func PostTest1(questUrl string,args map[string]string)[]byte {
 	fmt.Println("response:",string(body))
 	fmt.Println()
 	return body
+}
+
+func getAccessToken() string{
+	type Data struct {
+		ExpireIn    int    `json:"expireIn"`
+		AccessToken string `json:"accessToken"`
+	}
+	type Response struct {
+		Code int  `json:"code"`
+		Data Data `json:"data"`
+	}
+	orgs := make(map[string]string)
+	orgs[constant.AppId] = constant.AppIdGravity
+	orgs["appSecret"] = constant.AppSecret
+	response := PostAccessToken("https://baas.58.com/token/clientCredentials?", orgs)
+	var res Response
+	json.Unmarshal(response, &res)
+	return res.Data.AccessToken
 }

@@ -17,10 +17,6 @@ const (
 	ChainCodeName = "chaincodeName"
 	AccessToken   = "accessToken"
 
-	////Function
-	//Invoke = "invoke"
-	//Query  = "query"
-
 	//ChainCodeName
 	ChainCodeUser     = "user"
 	ChainCodeInfo     = "info"
@@ -39,8 +35,8 @@ const (
 	GetTradeByBusiness       = "getTradeByBusiness"
 
 	//chainCodeVersion
-	UserVersion     = "1"
-	InfoVersion     = "1"
-	MatchingVersion = "1"
-	TradeVersion    = "2"
+	UserVersion     = "9"
+	InfoVersion     = "8"
+	MatchingVersion = "8"
+	TradeVersion    = "8"
 )

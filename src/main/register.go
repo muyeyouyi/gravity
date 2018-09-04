@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"encoding/json"
 	"constant"
+	"log"
 )
 
 type Register struct {
@@ -47,7 +48,7 @@ func (user *Register) RegisterCommit(wlt wallet.Wallet) {
 	args[constant.AppId] = constant.AppIdGravity
 
 	//网络请求
-	util.PostTest1(constant.UrlInvoke, args)
+	util.PostTest(constant.UrlInvoke, args)
 
 }
 
@@ -60,31 +61,39 @@ func (user *Register) GetUserInfo(wlt wallet.Wallet) {
 	args[constant.Version] = constant.UserVersion
 	args[constant.Function] = constant.Get
 	args[constant.AppId] = constant.AppIdGravity
-	args[constant.AccessToken] = AccessToken
 
 	args[constant.Args0] = util.Base64(wlt.PublicKey)
 	res := util.PostTest(constant.UrlQuery, args)
 
+	analysis(res, wlt)
+
+}
+
+func analysis(res []byte, wlt wallet.Wallet) {
+	defer func() {
+		if e := recover(); e!= nil{
+			log.Fatalln("error:json解析异常")
+		}
+	}()
+
 	//解析
 	var userInfo Register
-	json.Unmarshal(res,&userInfo)
-	userInfo.ID = util.AesAndBase64Decode(userInfo.ID,wlt.AesKey)
-	userInfo.Name = util.AesAndBase64Decode(userInfo.Name,wlt.AesKey)
-	userInfo.Age = util.AesAndBase64Decode(userInfo.Age,wlt.AesKey)
-	userInfo.Phonenum = util.AesAndBase64Decode(userInfo.Phonenum,wlt.AesKey)
+	json.Unmarshal(res, &userInfo)
+	userInfo.ID = util.AesAndBase64Decode(userInfo.ID, wlt.AesKey)
+	userInfo.Name = util.AesAndBase64Decode(userInfo.Name, wlt.AesKey)
+	userInfo.Age = util.AesAndBase64Decode(userInfo.Age, wlt.AesKey)
+	userInfo.Phonenum = util.AesAndBase64Decode(userInfo.Phonenum, wlt.AesKey)
 	if userInfo.CompanyID != "" {
-		userInfo.CompanyID = util.AesAndBase64Decode(userInfo.CompanyID,wlt.AesKey)
+		userInfo.CompanyID = util.AesAndBase64Decode(userInfo.CompanyID, wlt.AesKey)
 	}
-
 	fmt.Println("用户信息：")
-	fmt.Println("昵称：",userInfo.Nickname)
-	fmt.Println("姓名：",userInfo.Name)
-	fmt.Println("年龄：",userInfo.Age)
-	fmt.Println("电话：",userInfo.Phonenum)
-	fmt.Println("身份证号：",userInfo.ID)
+	fmt.Println("昵称：", userInfo.Nickname)
+	fmt.Println("姓名：", userInfo.Name)
+	fmt.Println("年龄：", userInfo.Age)
+	fmt.Println("电话：", userInfo.Phonenum)
+	fmt.Println("身份证号：", userInfo.ID)
 	if userInfo.CompanyName != "" {
-		fmt.Println("企业名称：",userInfo.CompanyName)
-		fmt.Println("法人登记证号：",userInfo.CompanyID)
+		fmt.Println("企业名称：", userInfo.CompanyName)
+		fmt.Println("法人登记证号：", userInfo.CompanyID)
 	}
-
 }

@@ -78,7 +78,7 @@ func (cli *Cli) Run() {
 
 	//获取用户信息
 	getUserCmd := flag.NewFlagSet(getUser, flag.ExitOnError)
-	getUserWallet := getUserCmd.String(name, "", "在-w后输入钱包名")
+	getUserWallet := getUserCmd.String(walletName, "", "在-w后输入钱包名")
 
 	//创建帖子
 	createPostCmd := flag.NewFlagSet(createPost, flag.ExitOnError)
@@ -221,11 +221,13 @@ func (cli *Cli) Run() {
 		if *getUserWallet != "" {
 			wlt, e := wallet.ExamWallet(*getUserWallet)
 			if e != nil {
+				util.LogE(e)
+			}else{
 				reg := &Register{}
 				reg.GetUserInfo(wlt)
 			}
 		} else {
-			registerCusCmd.Usage()
+			getUserCmd.Usage()
 			os.Exit(1)
 		}
 	}

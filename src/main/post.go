@@ -46,7 +46,6 @@ func (post *Post) GetPosts(pubkey string) {
 	args[constant.Version] = constant.InfoVersion
 	args[constant.Function] = constant.GetByOwner
 	args[constant.AppId] = constant.AppIdGravity
-	args[constant.AccessToken] = AccessToken
 
 	args[constant.Args0] = pubkey
 	util.PostTest(constant.UrlQuery, args)
@@ -61,7 +60,6 @@ func (post *Post) GetPostDetail(ID string) {
 	args[constant.Version] = constant.InfoVersion
 	args[constant.Function] = constant.Get
 	args[constant.AppId] = constant.AppIdGravity
-	args[constant.AccessToken] = AccessToken
 
 	args[constant.Args0] = ID
 	util.PostTest(constant.UrlQuery, args)

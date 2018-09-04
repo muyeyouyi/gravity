@@ -55,7 +55,6 @@ func (order *Order) GetCustomOrder(pubkey string) {
 	args[constant.Version] = constant.TradeVersion
 	args[constant.Function] = constant.GetTradeByConstumer
 	args[constant.AppId] = constant.AppIdGravity
-	args[constant.AccessToken] = AccessToken
 
 	args[constant.Args0] = pubkey
 	util.PostTest(constant.UrlQuery,args)
@@ -70,7 +69,6 @@ func (order *Order) GetBusinessOrder(pubkey string) {
 	args[constant.Version] = constant.TradeVersion
 	args[constant.Function] = constant.GetTradeByBusiness
 	args[constant.AppId] = constant.AppIdGravity
-	args[constant.AccessToken] = AccessToken
 
 	args[constant.Args0] = pubkey
 	util.PostTest(constant.UrlQuery,args)
