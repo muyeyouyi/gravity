@@ -10,7 +10,7 @@ import (
 
 func main() {
 	cli()
-
+//fmt.Println("\\u0000")
 }
 
 
@@ -49,3 +49,5 @@ func testAes() {
 	decrypt, _ := util.AesDecrypt(bytes, sum256[:])
 	fmt.Println(string(decrypt))
 }
+
+

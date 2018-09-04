@@ -8,7 +8,13 @@ import (
 	"net/url"
 	"constant"
 	"encoding/json"
+	"bytes"
+	"encoding/gob"
+	"crypto/elliptic"
+	"log"
+	"os"
 )
+
 
 
 func PostAccessToken(questUrl string,args map[string]string)[]byte {
@@ -73,8 +79,8 @@ func PostTest(questUrl string,args map[string]string)[]byte {
 		values.Add(k, v)
 	}
 	paramsA = values.Encode()
-	fmt.Println("paramsParse:",paramsA)
-	fmt.Println()
+	//fmt.Println("paramsParse:",paramsA)
+	//fmt.Println()
 
 	resp, err := http.Post(questUrl,
 		"application/x-www-form-urlencoded",
@@ -110,4 +116,64 @@ func getAccessToken() string{
 	var res Response
 	json.Unmarshal(response, &res)
 	return res.Data.AccessToken
+}
+
+type Ids struct {
+	Ids map[string]string
+}
+
+
+func SaveId(ids map[string]string,fileName string)  {
+	oldIds:= ReadId(fileName)
+	if len(oldIds)== 0{
+		oldIds = make(map[string]string)
+	}else{
+		for key, value := range ids {
+			oldIds[key] = value
+		}
+	}
+
+
+	idStruct := &Ids{ids}
+
+	var content bytes.Buffer
+
+	gob.Register(elliptic.P256())
+
+	encoder := gob.NewEncoder(&content)
+	err := encoder.Encode(idStruct)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	err = ioutil.WriteFile(fileName, content.Bytes(), 0644)
+	if err != nil {
+		log.Panic(err)
+	}
+}
+
+/**
+	读取本地钱包信息
+ */
+func ReadId(fileName string) map[string]string{
+	if _, err := os.Stat(fileName); os.IsNotExist(err) {
+		return nil
+	}
+
+	fileContent, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	var idStruct Ids
+
+	gob.Register(elliptic.P256())
+	decoder := gob.NewDecoder(bytes.NewReader(fileContent))
+	err = decoder.Decode(&idStruct)
+	//fmt.Println("map",ids)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	return idStruct.Ids
 }

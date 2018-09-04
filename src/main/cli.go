@@ -91,7 +91,7 @@ func (cli *Cli) Run() {
 
 	//查询商家帖子列表
 	getPostsCmd := flag.NewFlagSet(getPost, flag.ExitOnError)
-	getPostsWallet := getPostsCmd.String(title, "", "在-w后输入钱包名称")
+	getPostsWallet := getPostsCmd.String(walletName, "", "在-w后输入钱包名称")
 
 	//查询帖子详情
 	getPostDetailCmd := flag.NewFlagSet(getPostDetail, flag.ExitOnError)
@@ -209,7 +209,7 @@ func (cli *Cli) Run() {
 			fmt.Println(*userInfo)
 			cli.register(*regBWallet, userInfo)
 		} else {
-			registerCusCmd.Usage()
+			registerBusCmd.Usage()
 			os.Exit(1)
 		}
 	}
@@ -276,8 +276,16 @@ func (cli *Cli) Run() {
 	 */
 	if getPostsCmd.Parsed() {
 		if *getPostsWallet != "" {
-			post := &Post{}
-			post.GetPosts(*getPostsWallet)
+			wlt, e := wallet.ExamWallet(*getPostsWallet)
+			if e != nil {
+				util.LogE(e)
+			}else{
+				post := &Post{}
+				post.GetPosts(base64.StdEncoding.EncodeToString(wlt.PublicKey))
+			}
+		} else {
+			getPostsCmd.Usage()
+			os.Exit(1)
 		}
 	}
 
@@ -285,7 +293,9 @@ func (cli *Cli) Run() {
 		查询帖子详情
 	 */
 	if getPostDetailCmd.Parsed() {
+
 		if *getPostDetailId != "" {
+			fmt.Println(*getPostDetailId)
 			post := &Post{}
 			post.GetPostDetail(*getPostDetailId)
 		}
@@ -416,7 +426,7 @@ func (cli *Cli) printUsage() {
 	fmt.Println("-----------------------------------信息-------------------------------------------------------")
 	fmt.Println("    （发布信息）createpost -w mike -title 北京地区搬家 -bn 哥俩好搬家公司 -content 负责朝阳区搬家业务 -price 200 -city 北京 ")
 	fmt.Println("    （根据商家获取信息列表）getbusorder -w mike")
-	fmt.Println("    （根据信息ID查询信息）getorderdetail -id id")
+	fmt.Println("    （根据信息ID查询信息）getpostdetail -id id")
 	fmt.Println("-----------------------------------合约-------------------------------------------------------")
 	fmt.Println("    （获取合约列表）getchaincode")
 	fmt.Println("    （匹配）usechaincode -id 链码id -city 北京 -lowp 50 -highp 1000")

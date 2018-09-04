@@ -71,11 +71,11 @@ func (user *Register) GetUserInfo(wlt wallet.Wallet) {
 	args[constant.Args0] = util.Base64(wlt.PublicKey)
 	res := util.PostTest(constant.UrlQuery, args)
 
-	analysis(res, wlt)
+	user.analysis(res, wlt)
 
 }
 
-func analysis(res []byte, wlt wallet.Wallet) {
+func (user *Register) analysis(res []byte, wlt wallet.Wallet) {
 	defer func() {
 		if e := recover(); e!= nil{
 			log.Fatalln("error:json解析异常")

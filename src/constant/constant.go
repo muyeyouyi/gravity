@@ -35,8 +35,11 @@ const (
 	GetTradeByBusiness       = "getTradeByBusiness"
 
 	//chainCodeVersion
-	UserVersion     = "11"
-	InfoVersion     = "8"
-	MatchingVersion = "8"
-	TradeVersion    = "8"
+	UserVersion     = "12"
+	InfoVersion     = "9"
+	MatchingVersion = "9"
+	TradeVersion    = "9"
+
+	//缓存文件
+	OrderIdFile = "orderid.dat"
 )
