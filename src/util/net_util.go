@@ -14,7 +14,12 @@ import (
 	"log"
 	"os"
 )
-
+type Response struct {
+	Status int `json:"status"`
+	Message string `json:"message"`
+	BlockNumber string `json:"blockNumber"`
+	Data []string `json:"data"`
+}
 
 
 func PostAccessToken(questUrl string,args map[string]string)[]byte {
@@ -97,7 +102,22 @@ func PostTest(questUrl string,args map[string]string)[]byte {
 	}
 	fmt.Println("response:",string(body))
 	fmt.Println()
-	return body
+
+	defer func() {
+		if e := recover(); e!= nil{
+			//log.Fatalln("error:json解析异常")
+		}
+	}()
+	var response Response
+	json.Unmarshal(body, &response)
+	if response.Status != 200 {
+		panic("请求失败！")
+	}
+	info := response.Data[0]
+	if info != "" {
+		fmt.Println("解析:",info)
+	}
+	return []byte(info)
 }
 
 func getAccessToken() string{

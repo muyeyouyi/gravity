@@ -36,10 +36,11 @@ const (
 
 	//chainCodeVersion
 	UserVersion     = "12"
-	InfoVersion     = "9"
+	InfoVersion     = "10"
 	MatchingVersion = "9"
 	TradeVersion    = "9"
 
 	//缓存文件
 	OrderIdFile = "orderid.dat"
+	ChainCodeFile = "chaincodeid.dat"
 )

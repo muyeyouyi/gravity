@@ -4,6 +4,7 @@ import (
 	"wallet"
 	"constant"
 	"util"
+	"fmt"
 )
 
 type Order struct {
@@ -14,7 +15,10 @@ type Order struct {
 	用户下单
  */
 func (order *Order) PlaceOrder(wlt wallet.Wallet) {
-	args := Sign(wlt, order.Id)
+	readId := util.ReadId(constant.OrderIdFile)
+	fmt.Println("id:",readId[order.Id])
+	args := Sign(wlt, readId[order.Id])
+	//args := Sign(wlt, order.Id)
 	args[constant.ChainCodeName] = constant.ChainCodeTrade
 	args[constant.Version] = constant.TradeVersion
 	args[constant.Function] = constant.Submit
@@ -26,7 +30,9 @@ func (order *Order) PlaceOrder(wlt wallet.Wallet) {
 	用户完成订单
  */
 func (order *Order) FinishOrder(wlt wallet.Wallet) {
-	args := Sign(wlt, order.Id)
+	readId := util.ReadId(constant.OrderIdFile)
+	args := Sign(wlt, readId[order.Id])
+	//args := Sign(wlt, order.Id)
 	args[constant.ChainCodeName] = constant.ChainCodeTrade
 	args[constant.Version] = constant.TradeVersion
 	args[constant.Function] = constant.Finish
@@ -38,7 +44,9 @@ func (order *Order) FinishOrder(wlt wallet.Wallet) {
 	商家确认订单
  */
 func (order *Order) ConfirmOrder(wlt wallet.Wallet) {
-	args := Sign(wlt, order.Id)
+	readId := util.ReadId(constant.OrderIdFile)
+	args := Sign(wlt, readId[order.Id])
+	//args := Sign(wlt, order.Id)
 	args[constant.ChainCodeName] = constant.ChainCodeTrade
 	args[constant.Version] = constant.TradeVersion
 	args[constant.Function] = constant.Confirm
