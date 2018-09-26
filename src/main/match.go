@@ -27,7 +27,7 @@ func (match *Match) GetMatchList() {
 	ids := make(map[string]string)
 	for index, value := range ccs {
 		ids[strconv.Itoa(index)] = value
-		fmt.Println("合约"+strconv.Itoa(index)+":", value)
+		fmt.Println("合约"+strconv.Itoa(index)+":", value,"  ID:",strconv.Itoa(index))
 	}
 	util.SaveId(ids, constant.ChainCodeFile)
 }
@@ -62,8 +62,10 @@ func (match *Match) Match(city, id, lowPrice, highPrice string) {
 		fmt.Println("城市：", info.City)
 		fmt.Println("价格：", info.Price)
 		fmt.Println("时间戳：", info.PublishTime)
-		fmt.Println()
 		ids[info.CompanyName +index] = info.ID
+		fmt.Println("ID缓存key：", info.CompanyName +index)
+		fmt.Println()
+
 	}
-	util.SaveId(ids, constant.OrderIdFile)
+	util.SaveId(ids, constant.PostIdFile)
 }

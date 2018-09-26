@@ -23,24 +23,25 @@ const (
 	ChainCodeTrade    = "trade"
 	ChainCodeMatching = "matching"
 	//Function
-	Set          = "set"
-	Get          = "get"
-	GetByOwner   = "getByOwner"
-	Matching     = "matching"
-	MatchingList = "matchingList"
-	Submit       = "submit"
-	Confirm       = "confirm"
-	Finish       = "finish"
-	GetTradeByConstumer       = "getTradeByConstumer"
-	GetTradeByBusiness       = "getTradeByBusiness"
+	Set                 = "set"
+	Get                 = "get"
+	GetByOwner          = "getByOwner"
+	Matching            = "matching"
+	MatchingList        = "matchingList"
+	Submit              = "submit"
+	Confirm             = "confirm"
+	Finish              = "finish"
+	GetTradeByConstumer = "getTradeByConstumer"
+	GetTradeByBusiness  = "getTradeByBusiness"
 
 	//chainCodeVersion
 	UserVersion     = "12"
 	InfoVersion     = "10"
 	MatchingVersion = "9"
-	TradeVersion    = "9"
+	TradeVersion    = "10"
 
 	//缓存文件
-	OrderIdFile = "orderid.dat"
-	ChainCodeFile = "chaincodeid.dat"
+	PostIdFile    = "postid.dat"      //帖子ID
+	ChainCodeFile = "chaincodeid.dat" //链码ID
+	OrderIdFile   = "orderid.dat"     //订单ID
 )

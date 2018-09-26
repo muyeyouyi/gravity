@@ -311,7 +311,7 @@ func (cli *Cli) Run() {
 			wlt := ExamWallet(cli, *getCusOrderWallet)
 			if wlt != nil {
 				getInfo := &Order{}
-				getInfo.GetCustomOrder(base64.StdEncoding.EncodeToString(wlt.PublicKey))
+				getInfo.GetCustomOrder(wlt)
 			}
 		} else {
 			getCusOrderCmd.Usage()
@@ -425,7 +425,7 @@ func (cli *Cli) printUsage() {
 	fmt.Println("    （查询用户信息）getuser -w mike")
 	fmt.Println("-----------------------------------信息-------------------------------------------------------")
 	fmt.Println("    （发布信息）createpost -w mike -title 北京地区搬家 -bn 哥俩好搬家公司 -content 负责朝阳区搬家业务 -price 200 -city 北京 ")
-	fmt.Println("    （根据商家获取信息列表）getbusorder -w mike")
+	fmt.Println("    （根据商家获取信息列表）getpost -w mike")
 	fmt.Println("    （根据信息ID查询信息）getpostdetail -id 商家0012（公司名+序号）")
 	fmt.Println("-----------------------------------合约-------------------------------------------------------")
 	fmt.Println("    （获取合约列表）getchaincode")

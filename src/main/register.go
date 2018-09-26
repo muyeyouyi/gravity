@@ -81,14 +81,6 @@ func (user *Register) analysis(res []byte, wlt wallet.Wallet) {
 			log.Fatalln("error:json解析异常")
 		}
 	}()
-	//var response Response
-	//json.Unmarshal(res, &response)
-	//if response.Status != 200 {
-	//	panic("请求失败！")
-	//}
-	//info := response.Data[0]
-	//fmt.Println("info:",info)
-
 	//解析
 	var userInfo Register
 	json.Unmarshal(res, &userInfo)

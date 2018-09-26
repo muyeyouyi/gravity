@@ -114,9 +114,9 @@ func PostTest(questUrl string,args map[string]string)[]byte {
 		panic("请求失败！")
 	}
 	info := response.Data[0]
-	if info != "" {
-		fmt.Println("解析:",info)
-	}
+	//if info != "" {
+	//	fmt.Println("解析:",info)
+	//}
 	return []byte(info)
 }
 
