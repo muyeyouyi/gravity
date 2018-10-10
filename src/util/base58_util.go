@@ -21,7 +21,7 @@ func Base58Encode(input []byte) []byte {
 		x.DivMod(x, base, mod)
 		result = append(result, b58Alphabet[mod.Int64()])
 	}
-	ReverseBytes(result)
+	reverseBytes(result)
 	for b := range input {
 		if b == 0x00 {
 			result = append([]byte{b58Alphabet[0]}, result...)
@@ -30,7 +30,7 @@ func Base58Encode(input []byte) []byte {
 		}
 	}
 
-	return result
+	return append([]byte{0x00},result...)
 }
 
 // Base58Decode decodes Base58-encoded data
@@ -54,10 +54,10 @@ func Base58Decode(input []byte) []byte {
 	decoded := result.Bytes()
 	decoded = append(bytes.Repeat([]byte{byte(0x00)}, zeroBytes), decoded...)
 
-	return decoded
+	return decoded[1:]
 }
 
-func ReverseBytes(data []byte) {
+func reverseBytes(data []byte) {
 	for i, j := 0, len(data)-1; i < j; i, j = i+1, j-1 {
 		data[i], data[j] = data[j], data[i]
 	}

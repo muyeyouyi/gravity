@@ -1,19 +1,18 @@
 package util
 
 import (
+	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
-	"bytes"
-	"encoding/base64"
 )
 
-func AesEncrypt(origData, key []byte) []byte {
+func aesEncrypt(origData, key []byte) []byte {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil
 	}
 	blockSize := block.BlockSize()
-	origData = PKCS5Padding(origData, blockSize)
+	origData = pKCS5Padding(origData, blockSize)
 	// origData = ZeroPadding(origData, block.BlockSize())
 	blockMode := cipher.NewCBCEncrypter(block, key[:blockSize])
 	crypted := make([]byte, len(origData))
@@ -23,7 +22,7 @@ func AesEncrypt(origData, key []byte) []byte {
 	return crypted
 }
 
-func AesDecrypt(crypted, key []byte) ([]byte, error) {
+func aesDecrypt(crypted, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -33,18 +32,18 @@ func AesDecrypt(crypted, key []byte) ([]byte, error) {
 	origData := make([]byte, len(crypted))
 	// origData := crypted
 	blockMode.CryptBlocks(origData, crypted)
-	origData = PKCS5UnPadding(origData)
+	origData = pKCS5UnPadding(origData)
 	// origData = ZeroUnPadding(origData)
 	return origData, nil
 }
 
-func PKCS5Padding(ciphertext []byte, blockSize int) []byte {
+func pKCS5Padding(ciphertext []byte, blockSize int) []byte {
 	padding := blockSize - len(ciphertext)%blockSize
 	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
 	return append(ciphertext, padtext...)
 }
 
-func PKCS5UnPadding(origData []byte) []byte {
+func pKCS5UnPadding(origData []byte) []byte {
 	length := len(origData)
 	// 去掉最后一个字节 unpadding 次
 	unpadding := int(origData[length-1])
@@ -52,24 +51,24 @@ func PKCS5UnPadding(origData []byte) []byte {
 }
 
 /**
-	对字段加密和base58编码
- */
-func AesAndBase64Encode(info string,key []byte) string {
-	encrypt := AesEncrypt([]byte(info), key)
-	encodeString := base64.StdEncoding.EncodeToString(encrypt)
+对字段加密和base58编码
+*/
+func AesAndBase58Encode(info string, key []byte) string {
+	encrypt := aesEncrypt([]byte(info), key)
+	encodeString := Base58(encrypt)
 	return encodeString
 }
 
 /**
-	base58解码和解密
- */
-func AesAndBase64Decode(info string,key []byte) string  {
-	decodeString, e := base64.StdEncoding.DecodeString(info)
-	decrypt, e := AesDecrypt(decodeString, key)
+base58解码和解密
+*/
+func AesAndBase58Decode(info string, key []byte) string {
+	decodeString := Base58Decode([]byte(info))
+	decrypt, e := aesDecrypt(decodeString, key)
 	LogE(e)
 	return string(decrypt)
 }
 
-func Base64(pubkey []byte) string  {
-	return base64.StdEncoding.EncodeToString(pubkey)
+func Base58(pubkey []byte) string {
+	return string(Base58Encode(pubkey))
 }

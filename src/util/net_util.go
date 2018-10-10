@@ -174,7 +174,7 @@ func SaveId(ids map[string]string,fileName string)  {
 
 /**
 	读取本地钱包信息
- */
+*/
 func ReadId(fileName string) map[string]string{
 	if _, err := os.Stat(fileName); os.IsNotExist(err) {
 		return nil
