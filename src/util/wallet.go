@@ -59,10 +59,6 @@ func (wlt *Wallet) Verify(pubkey, json, sign string) bool {
 	s := big.Int{}
 
 	fullSign := Base58Decode([]byte(sign))
-	//trueSign := fullSign[1:]
-
-	//trueSign := Base58Decode([]byte(sign))
-	//fmt.Println("base58解码:",trueSign)
 	sigLen := len(fullSign)
 	r.SetBytes(fullSign[:(sigLen / 2)])
 	s.SetBytes(fullSign[(sigLen / 2):])
